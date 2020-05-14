@@ -11,11 +11,17 @@ type (
 		Name	string	`json:"name"`
 		Role	string	`json:"role"`
 	}
+	Post struct {
+		Id		string	`json:"id"`
+		Content string	`json:"content"`
+		Author	string	`json:"author"`
+	}
 )
 
 var (
 	users	map[string]User
 	CurrentLoginUser User
+	Posts map[string]Post
 )
 
 func LoginServe() {
@@ -27,6 +33,8 @@ func LoginServe() {
 	e.POST("/login", Login)
 	e.GET("/member", MemberPage)
 	e.GET("/admin", AdminPage)
+	e.GET("/post/list", GetPostsPage)
+	e.POST("/post/delete", DeletePost)
 	e.Logger.Fatal(e.Start("0.0.0.0:3001"))
 }
 
@@ -35,6 +43,12 @@ func InitUsers() {
 	users["Admin"] = User{Name: "Admin", Role: "admin"}
 	users["Member1"] = User{Name: "Member1", Role: "member"}
 	users["Member2"] = User{Name: "Member2", Role: "member"}
+}
+
+func InitPosts() {
+	Posts = map[string]Post{}
+	Posts["1"] = Post{Id:"post1", Content:"Post1-Content", Author:"Member1"}
+	Posts["2"] = Post{Id:"post2", Content:"Post2-Content", Author:"Member2"}
 }
 
 func (u User) GetUserByName(name string) User {
@@ -48,6 +62,11 @@ func (u User) GetLoginUserRole() string {
 	return CurrentLoginUser.Role
 }
 
+func (u User) GetLoginName() string {
+	return CurrentLoginUser.Name
+}
+
+
 func Login(c echo.Context) error {
 	user := new(User)
 	if err := c.Bind(user); err != nil {
@@ -58,6 +77,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "User do not exists")
 	}
 	CurrentLoginUser = User{Name: loginUser.Name, Role: loginUser.Role}
+	InitPosts()
 	return c.JSON(http.StatusOK, loginUser)
 }
 
@@ -67,4 +87,20 @@ func MemberPage(c echo.Context) error {
 
 func AdminPage(c echo.Context) error {
 	return c.JSON(http.StatusOK, "GET /admin OK")
+}
+func GetPostsPage(c echo.Context) error {
+	return c.JSON(http.StatusOK, Posts)
+}
+
+func DeletePost(c echo.Context) error {
+	p := new(Post)
+	if  err := c.Bind(p); err != nil {
+		return c.JSON(http.StatusBadRequest, "Post do not exists")
+	}
+	post := Posts[p.Id]
+	if post.Id == "" {
+		return c.JSON(http.StatusBadRequest, "Post do not exists")
+	}
+	delete(Posts, post.Id)
+	return c.JSON(http.StatusOK, post)
 }

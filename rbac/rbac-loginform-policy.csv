@@ -2,3 +2,5 @@ p, *, /login, *
 p, admin, /*, *
 p, member, /logout, *
 p, member, /member, *
+p, member, /post/delete, *
+p, member, /post/list, *
