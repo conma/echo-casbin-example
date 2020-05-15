@@ -20,8 +20,8 @@ func (e *LoginFormEnforcer) LoginFormEnforcer(next echo.HandlerFunc) echo.Handle
 		if path == "/post/delete" {
 			if role == "member" {
 				loginName := User{}.GetLoginName()
-				post := Post{}
-				c.Bind(post)
+				postId := c.QueryParam("id")
+				post := Posts[postId]
 				if loginName != post.Author {
 					return echo.ErrForbidden
 				}

@@ -22,4 +22,9 @@ main.go:
  `curl localhost:3001/admin` => OK  
  `curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d '{"name":"Member1"}'` => OK  
  `curl localhost:3001/admin` => Forbidden  
- `curl localhost:3001/member` => OK
+ `curl localhost:3001/member` => OK  
+ Member1 cannot delete posts of Member2:  
+ `curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d '{"name":"Member1"}'` => OK    
+ `curl localhost:3001/post/list` => response: Posts[post1, post2]  
+ `curl -X POST localhost:3001/post/delete?id=post1` => OK => Posts[post2]  
+ `curl -X POST localhost:3001/post/delete?id=post2` => Forbidden

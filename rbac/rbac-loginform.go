@@ -47,8 +47,8 @@ func InitUsers() {
 
 func InitPosts() {
 	Posts = map[string]Post{}
-	Posts["1"] = Post{Id:"post1", Content:"Post1-Content", Author:"Member1"}
-	Posts["2"] = Post{Id:"post2", Content:"Post2-Content", Author:"Member2"}
+	Posts["post1"] = Post{Id:"post1", Content:"Post1-Content", Author:"Member1"}
+	Posts["post2"] = Post{Id:"post2", Content:"Post2-Content", Author:"Member2"}
 }
 
 func (u User) GetUserByName(name string) User {
@@ -93,14 +93,14 @@ func GetPostsPage(c echo.Context) error {
 }
 
 func DeletePost(c echo.Context) error {
-	p := new(Post)
-	if  err := c.Bind(p); err != nil {
+	postId := c.QueryParam("id")
+	if postId == "" {
 		return c.JSON(http.StatusBadRequest, "Post do not exists")
 	}
-	post := Posts[p.Id]
+	post := Posts[postId]
 	if post.Id == "" {
 		return c.JSON(http.StatusBadRequest, "Post do not exists")
 	}
-	delete(Posts, post.Id)
+	delete(Posts, postId)
 	return c.JSON(http.StatusOK, post)
 }
